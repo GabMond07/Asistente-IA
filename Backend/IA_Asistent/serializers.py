@@ -1,6 +1,7 @@
 from .models import *
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,5 +26,10 @@ class DailySuggestionSerializer(serializers.ModelSerializer):
 class FinanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Finance 
-        fields = '__all__'  
+        fields = '__all__'
+
+class SurveyResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SurveyResponse
+        fields = '__all__'
 

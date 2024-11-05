@@ -22,4 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('Login/', views.login),
     path('Register/', views.register),
+    path('Logout/', views.logout),
+    path('survey/', views.save_survey_responses),
 ]
