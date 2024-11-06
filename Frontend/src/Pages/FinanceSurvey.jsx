@@ -27,18 +27,20 @@ const FinanceSurvey = () => {
     const question = surveyQuestions[currentQuestionIndex].question;
 
     // Guarda la respuesta actual
-    setResponses({ ...responses, [question]: answer });
+    const updatedResponses = { ...responses, [question]: answer };
+    setResponses(updatedResponses);
 
     // Avanza a la siguiente pregunta o envía el formulario si es la última
     if (currentQuestionIndex < surveyQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      handleSubmit();
+      handleSubmit(updatedResponses); // Pasa las respuestas actualizadas a handleSubmit
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (finalResponses) => {
     setLoading(true);
+
     try {
       const response = await fetch("http://127.0.0.1:8000/survey/", {
         method: "POST",
@@ -46,13 +48,13 @@ const FinanceSurvey = () => {
           "Content-Type": "application/json",
           Authorization: `Token ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify({ responses }), // Envía las respuestas como JSON
+        body: JSON.stringify({ responses: finalResponses }), // Envía las respuestas finales
       });
 
       if (!response.ok) {
         throw new Error("Error al guardar las respuestas");
       }
-      console.log(response);
+
       navigate("/dashboard"); // Redirige al dashboard después de completar la encuesta
     } catch (error) {
       console.error("Error al enviar la encuesta:", error);
@@ -74,15 +76,17 @@ const FinanceSurvey = () => {
             <p className="text-xl mb-5">
               {surveyQuestions[currentQuestionIndex].question}
             </p>
-            {surveyQuestions[currentQuestionIndex].options.map((option, idx) => (
-              <button
-                key={idx}
-                className="bg-blue-500 text-white px-6 py-3 m-2 rounded hover:bg-blue-700"
-                onClick={() => handleAnswerSelection(option)}
-              >
-                {option}
-              </button>
-            ))}
+            {surveyQuestions[currentQuestionIndex].options.map(
+              (option, idx) => (
+                <button
+                  key={idx}
+                  className="bg-blue-500 text-white px-6 py-3 m-2 rounded hover:bg-blue-700"
+                  onClick={() => handleAnswerSelection(option)}
+                >
+                  {option}
+                </button>
+              )
+            )}
             {/* Visor de progreso */}
             <div className="flex justify-center mt-8">
               {surveyQuestions.map((_, idx) => (
