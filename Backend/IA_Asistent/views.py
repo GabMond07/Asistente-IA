@@ -8,7 +8,9 @@ from django.shortcuts import get_object_or_404
 from .models import *
 from .serializers import *
 from django.contrib.auth import get_user_model
-import json
+from rest_framework.response import Response
+from django.http import JsonResponse
+from .service import obtener_respuesta_chatgpt
 User = get_user_model()
 
 # Login
@@ -78,3 +80,29 @@ def save_survey_responses(request):
     else:
         return Response({'message': 'Respuestas actualizadas correctamente', 'survey_complete': True}, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def consulta_chatgpt(request):
+    usuario = request.user
+    pregunta = request.data.get("pregunta")
+
+    if not pregunta:
+        return Response({"error": "Debe enviar una pregunta"}, status=400)
+
+    # Verificar si ya existe una respuesta en ChatHistory para la misma pregunta del usuario
+    respuesta_existente = ChatHistory.objects.filter(user=usuario, user_message=pregunta).first()
+
+    if respuesta_existente:
+        return Response({"respuesta": respuesta_existente.assistant_response}, status=200)
+
+    # Si no está en la base de datos, consulta a la API
+    try:
+        respuesta_texto = obtener_respuesta_chatgpt(pregunta)
+        
+        # Guardar en ChatHistory para consultas futuras
+        ChatHistory.objects.create(user=usuario, user_message=pregunta, assistant_response=respuesta_texto)
+        
+        return Response({"respuesta": respuesta_texto}, status=200)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

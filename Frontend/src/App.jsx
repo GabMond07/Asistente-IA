@@ -11,6 +11,8 @@ import Login from "./Pages/Login";
 import Dashboard from "./Pages/Dashboard";
 import FinanceSurvey from "./Pages/FinanceSurvey";
 import ProtectedRoute from "./routes/protectedRoute";
+import Plans from "./Pages/Plans";
+import Chat from "./Pages/Chat";
 
 const AppRoutes = () => {
   const { isAuthenticated, surveyCompleted } = useAuth();
@@ -35,9 +37,9 @@ const AppRoutes = () => {
     {
       path: "/dashboard",
       element: isAuthenticated ? (
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
       ) : (
         <Navigate to="/login" replace />
       ),
@@ -54,6 +56,23 @@ const AppRoutes = () => {
         )
       ) : (
         <Navigate to="/login" replace />
+      ),
+    },
+    {
+      path: "/plans",
+      element: (
+        <ProtectedRoute>
+          <Plans />,
+        </ProtectedRoute>
+      ),
+    },
+    
+    {
+      path: "/chat",
+      element: (
+        <ProtectedRoute>
+          <Chat />,
+        </ProtectedRoute>
       ),
     },
   ]);

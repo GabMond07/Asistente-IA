@@ -24,4 +24,5 @@ urlpatterns = [
     path('Register/', views.register),
     path('Logout/', views.logout),
     path('survey/', views.save_survey_responses),
+    path('api/consulta-chatgpt/', views.consulta_chatgpt, name='consulta_chatgpt'),
 ]

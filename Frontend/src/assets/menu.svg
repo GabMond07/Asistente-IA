@@ -1,0 +1,40 @@
+<svg width="70" height="40" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .rect {
+      fill: #000013;
+      stroke: white;
+      stroke-width: 2;
+      rx: 10; /* Esquinas redondeadas */
+      ry: 10;
+      cursor: pointer;
+    }
+    .line {
+      stroke: white;
+      stroke-width: 1.5;
+    }
+    .dots {
+      fill: white;
+    }
+    .active {
+      fill: #00aaff;
+    }
+  </style>
+
+  <!-- Rectángulo principal con esquinas redondeadas -->
+  <rect x="1" y="1" width="48" height="48" class="rect" onclick="toggleActive(event)"/>
+
+  <!-- Línea divisoria en el medio del rectángulo -->
+  <line x1="25" y1="5" x2="25" y2="45" class="line" />
+
+  <!-- Tres puntos en disposición vertical en la parte superior izquierda -->
+  <circle cx="12" cy="7" r="2" class="dots" />
+  <circle cx="12" cy="14" r="2" class="dots" />
+  <circle cx="12" cy="21" r="2" class="dots" />
+
+  <script>
+    // Alterna la clase "active" al hacer clic
+    function toggleActive(event) {
+      event.target.classList.toggle("active");
+    }
+  </script>
+</svg>
