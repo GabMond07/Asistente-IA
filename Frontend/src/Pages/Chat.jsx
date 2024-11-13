@@ -14,7 +14,7 @@ function Chat() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` 
+                    'Authorization': `Token ${localStorage.getItem('token')}` 
                 },
                 body: JSON.stringify({ pregunta }),
             });
@@ -33,27 +33,28 @@ function Chat() {
     };
 
     return (
-        <div>
-            <h2>Chat Asistente Financiero</h2>
+        <div className='flex flex-col items-center justify-center min-h-screen bg-[#000013]'>
+            <h2 className='text-white font-bold text-center text-5xl mb-10'>Chat Asistente Financiero</h2>
             <input 
+                className='text-black font-semibold text-xl mb-10 w-full rounded-lg border-2 border-[#007399] '
                 type="text" 
                 value={pregunta} 
                 onChange={(e) => setPregunta(e.target.value)} 
                 placeholder="Escribe tu pregunta..."
             />
-            <button onClick={enviarPregunta}>Enviar</button>
+            <button className='text-white font-semibold py-3 px-11 rounded-lg border-2 border-[#007399] shadow-[0px_0px_10px_3px_rgba(0,115,153,0.7)] hover:shadow-[0px_0px_15px_5px_rgba(0,115,153,1)] transition duration-300 ease-in-out transform hover:scale-105' onClick={enviarPregunta}>Enviar</button>
 
-            <div>
-                <h3>Respuesta</h3>
-                <p>{respuesta}</p>
+            <div className='mt-10'>
+                <h3 className='text-white font-bold text-center text-2xl'>Respuesta</h3>
+                <p className='text-white font-semibold text-center text-xl mb-10'>{respuesta}</p>
             </div>
 
             <div>
-                <h3>Historial</h3>
+                <h3 className='text-white font-bold text-center text-2xl'>Historial</h3>
                 {historial.map((item, index) => (
                     <div key={index} className="card">
-                        <p><strong>Pregunta:</strong> {item.pregunta}</p>
-                        <p><strong>Respuesta:</strong> {item.respuesta}</p>
+                        <p className='text-white font-semibold text-center text-xl mb-10'><strong>Pregunta:</strong> {item.pregunta}</p>
+                        <p className='text-white font-semibold text-center text-xl mb-10'><strong>Respuesta:</strong> {item.respuesta}</p>
                     </div>
                 ))}
             </div>

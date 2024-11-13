@@ -30,3 +30,5 @@ __pycache__/
 #Entorno virtual
 venv/
 
+#Clave de API ChatGPT
+.env

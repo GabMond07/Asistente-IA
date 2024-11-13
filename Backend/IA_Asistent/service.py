@@ -1,7 +1,11 @@
 # services.py
+import os
+from dotenv import load_dotenv
 import openai
 
-openai.api_key = "tu-api-key"
+load_dotenv()
+
+openai.api_key = os.getenv("API_KEY")
 
 def obtener_respuesta_chatgpt(pregunta):
     try:
