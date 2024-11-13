@@ -13,7 +13,7 @@ export function Navigation() {
   };
 
   return (
-    <div className="fixed right-0 w-full flex justify-between items-center py-5 ml-14 bg-[#000013] z-50 shadow-lg">
+    <div className="fixed right-0 w-full flex justify-between items-center py-6 ml-14 top-0 bg-[#000013] z-50 shadow-lg">
       <Link to="/dashboard">
         <h1 className="ml-16 font-bold text-5xl text-white">FinanceIA</h1>
       </Link>

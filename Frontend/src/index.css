@@ -5,3 +5,10 @@
 body{
     background-color: #000013;
 }
+
+/* Ocultar la barra de desplazamiento en el contenedor */
+body, html {
+    overflow-x: hidden; /* Desactiva el scroll horizontal */
+    overflow-y: hidden; /* Desactiva el scroll vertical */
+  }
+  
