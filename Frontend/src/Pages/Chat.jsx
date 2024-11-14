@@ -7,50 +7,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "../Components/Avatar";
 import React, { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Navigation } from "../Components/Navigation";
-import IA from "../assets/IA.svg";
 
 function Chat() {
+  const [pregunta, setPregunta] = useState(""); // Pregunta del usuario
+  const [respuesta, setRespuesta] = useState(""); // Respuesta de la IA
+  const [historial, setHistorial] = useState([]); // Historial de preguntas
   const [messages, setMessages] = useState([
     { role: "assistant", content: "¡Hola! ¿En qué puedo ayudarte hoy?" },
   ]);
-  const [input, setInput] = useState("");
-  const [history, setHistory] = useState(["Nueva conversación"]);
-
-  const handleSend = () => {
-    if (input.trim()) {
-      setMessages([...messages, { role: "user", content: input }]);
-      setHistory([...history, input]);
-      // Simular respuesta del asistente
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content:
-              "Gracias por tu mensaje. ¿En qué más puedo ayudarte? Lorem daaabdkjasbdjka",
-          },
-        ]);
-      }, 1000);
-      setInput("");
-    }
-  };
-
-  {
-    ("La chida");
-  }
-
-  const [pregunta, setPregunta] = useState("");
-  const [respuesta, setRespuesta] = useState("");
-  const [historial, setHistorial] = useState([]);
 
   const enviarPregunta = async () => {
-    
-    const [messages, setMessages] = useState([
-      { role: "assistant", content: "¡Hola! ¿En qué puedo ayudarte hoy?" },
-    ]);
-
     if (!pregunta) return;
-
+    setMessages([
+      ...messages,
+      { role: "user", content: pregunta },
+    ]);
     try {
       const response = await fetch(
         "http://localhost:8000/api/consulta-chatgpt/",
@@ -67,8 +38,18 @@ function Chat() {
       const data = await response.json();
 
       if (response.ok) {
-        setRespuesta(data.respuesta);
-        setHistorial([...historial, { pregunta, respuesta: data.respuesta }]);
+        setMessages([
+          ...messages,
+          { role: "user", content: pregunta },
+          { role: "assistant", content: data.respuesta },
+        ]);
+
+        setHistorial([
+          ...historial,
+          { pregunta }, // solo guardamos la pregunta del usuario en el historial
+        ]);
+
+        setPregunta(""); // Limpiar el campo de entrada después de enviar
       } else {
         console.error("Error:", data.error);
       }
@@ -82,7 +63,7 @@ function Chat() {
       <div className="ml-34">
         <Navigation />
         <Sidebar className="fixed left-0 top-0 h-full" />
-        <div className="flex flex-col flex-1 ml-60 pt-20">
+        <div className="flex flex-col flex-1 ml-60 pt-24">
           {" "}
           {/* Ajuste de margen y padding para respetar navbar y sidebar */}
           <div className="flex h-[calc(100vh-6rem)] bg-gray-100 p-4">
@@ -92,12 +73,12 @@ function Chat() {
             <div className="w-64 bg-white p-4 border-r">
               <h2 className="text-lg font-semibold mb-4">Historial</h2>
               <ScrollArea className="h-full">
-                {history.map((item, index) => (
+                {historial.map((item, index) => (
                   <div
                     key={index}
                     className="mb-2 text-sm text-gray-600 hover:bg-gray-100 p-2 rounded cursor-pointer"
                   >
-                    {item}
+                    <strong>Pregunta</strong> {item.pregunta}
                   </div>
                 ))}
               </ScrollArea>
@@ -125,6 +106,7 @@ function Chat() {
                           ? "bg-blue-500 text-white"
                           : "bg-white"
                       }`}
+                      style={{ whiteSpace: "pre-line" }}
                     >
                       {message.content}
                     </div>
@@ -140,8 +122,8 @@ function Chat() {
                     <span className="sr-only">Adjuntar archivo</span>
                   </Button>
                   <Textarea
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    value={pregunta}
+                    onChange={(e) => setPregunta(e.target.value)}
                     placeholder="Escribe un mensaje..."
                     className="flex-grow"
                   />

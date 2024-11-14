@@ -98,7 +98,7 @@ def consulta_chatgpt(request):
 
     # Si no está en la base de datos, consulta a la API
     try:
-        respuesta_texto = obtener_respuesta_chatgpt(pregunta)
+        respuesta_texto = obtener_respuesta_chatgpt(pregunta).replace("\\n", "\n")
         
         # Guardar en ChatHistory para consultas futuras
         ChatHistory.objects.create(user=usuario, user_message=pregunta, assistant_response=respuesta_texto)
