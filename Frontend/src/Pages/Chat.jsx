@@ -18,10 +18,7 @@ function Chat() {
 
   const enviarPregunta = async () => {
     if (!pregunta) return;
-    setMessages([
-      ...messages,
-      { role: "user", content: pregunta },
-    ]);
+    setMessages([...messages, { role: "user", content: pregunta }]);
     try {
       const response = await fetch(
         "http://localhost:8000/api/consulta-chatgpt/",
@@ -60,81 +57,87 @@ function Chat() {
 
   return (
     <>
-      <div className="ml-34">
+      <div className="ml-6 h-screen w-full">
         <Navigation />
         <Sidebar className="fixed left-0 top-0 h-full" />
-        <div className="flex flex-col flex-1 ml-60 pt-24">
-          {" "}
-          {/* Ajuste de margen y padding para respetar navbar y sidebar */}
-          <div className="flex h-[calc(100vh-6rem)] bg-gray-100 p-4">
-            {" "}
-            {/* Ajusta la altura restando el navbar */}
-            {/* Sidebar de historial */}
-            <div className="w-64 bg-white p-4 border-r">
-              <h2 className="text-lg font-semibold mb-4">Historial</h2>
-              <ScrollArea className="h-full">
-                {historial.map((item, index) => (
-                  <div
-                    key={index}
-                    className="mb-2 text-sm text-gray-600 hover:bg-gray-100 p-2 rounded cursor-pointer"
-                  >
-                    <strong>Pregunta</strong> {item.pregunta}
-                  </div>
-                ))}
-              </ScrollArea>
-            </div>
-            {/* Área principal del chat */}
-            <div className="flex-1 flex flex-col">
-              <ScrollArea className="flex-1 p-4">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={`flex items-start mb-4 ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
-                    {message.role === "assistant" && (
-                      <Avatar className="mr-2">
-                        <AvatarFallback>
-                          <Bot />
-                        </AvatarFallback>
-                      </Avatar>
-                    )}
-                    <div
-                      className={`p-3 rounded-lg max-w-md ${
-                        message.role === "user"
-                          ? "bg-blue-500 text-white"
-                          : "bg-white"
-                      }`}
-                      style={{ whiteSpace: "pre-line" }}
-                    >
-                      {message.content}
-                    </div>
-                  </div>
-                ))}
-              </ScrollArea>
 
-              {/* Entrada de mensaje */}
-              <div className="p-4 bg-white border-t">
-                <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="icon">
-                    <Paperclip className="h-4 w-4" />
-                    <span className="sr-only">Adjuntar archivo</span>
-                  </Button>
-                  <Textarea
-                    value={pregunta}
-                    onChange={(e) => setPregunta(e.target.value)}
-                    placeholder="Escribe un mensaje..."
-                    className="flex-grow"
-                  />
-                  <Button onClick={enviarPregunta}>
-                    <Send className="h-4 w-4" />
-                    <span className="sr-only">Enviar</span>
-                  </Button>
-                  <Button variant="outline" size="icon">
-                    <PenSquare className="h-4 w-4" />
-                    <span className="sr-only">Modificar pregunta</span>
-                  </Button>
+        <div className="flex-1 flex flex-col mr-2">
+          {/* Contenedor principal */}
+          <div className="flex flex-col flex-1 ml-56 pt-24 mr-5 space-y-4 ">
+            {" "}
+            {/* Ajuste de margen y padding para respetar navbar y sidebar */}
+            <div className="flex h-[calc(100vh-6rem)] bg-gray-100 p-4 ">
+              {" "}
+              {/* Ajusta la altura restando el navbar */}
+              {/* Sidebar de historial */}
+              <div className="w-64 bg-white p-4 border-r overflow-hidden">
+                <h2 className="text-lg font-semibold mb-4 over">Historial</h2>
+                <ScrollArea className="h-full">
+                  {historial.map((item, index) => (
+                    <div
+                      key={index}
+                      className="mb-2 text-sm text-gray-600 hover:bg-gray-100 p-2 rounded cursor-pointer"
+                    >
+                      <strong>Pregunta</strong> {item.pregunta}
+                    </div>
+                  ))}
+                </ScrollArea>
+              </div>
+              {/* Área principal del chat */}
+              <div className="flex-1 flex flex-col">
+                <ScrollArea className="flex-1 p-4">
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-start mb-4 ${
+                        message.role === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      }`}
+                    >
+                      {message.role === "assistant" && (
+                        <Avatar className="mr-2">
+                          <AvatarFallback>
+                            <Bot />
+                          </AvatarFallback>
+                        </Avatar>
+                      )}
+                      <div
+                        className={`p-3 rounded-lg max-w-md ${
+                          message.role === "user"
+                            ? "bg-blue-500 text-white"
+                            : "bg-white"
+                        }`}
+                        style={{ whiteSpace: "pre-line" }}
+                      >
+                        {message.content}
+                      </div>
+                    </div>
+                  ))}
+                </ScrollArea>
+
+                {/* Entrada de mensaje */}
+                <div className="p-4 bg-white border-t">
+                  <div className="flex items-center space-x-2">
+                    <Button variant="outline" size="icon">
+                      <Paperclip className="h-4 w-4" />
+                      <span className="sr-only">Adjuntar archivo</span>
+                    </Button>
+                    <Textarea
+                      value={pregunta}
+                      onChange={(e) => setPregunta(e.target.value)}
+                      placeholder="Escribe un mensaje..."
+                      className="flex-grow"
+                    />
+                    <Button onClick={enviarPregunta}>
+                      <Send className="h-4 w-4" />
+                      <span className="sr-only">Enviar</span>
+                    </Button>
+                    <Button variant="outline" size="icon">
+                      <PenSquare className="h-4 w-4" />
+                      <span className="sr-only">Modificar pregunta</span>
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

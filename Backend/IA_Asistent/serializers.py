@@ -33,3 +33,14 @@ class SurveyResponseSerializer(serializers.ModelSerializer):
         model = SurveyResponse
         fields = '__all__'
 
+class FinancialAssetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialAsset
+        fields = ['id', 'name', 'type', 'value', 'category', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+class FinancialLiabilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FinancialLiability
+        fields = ['id', 'name', 'type', 'amount', 'due_date', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']

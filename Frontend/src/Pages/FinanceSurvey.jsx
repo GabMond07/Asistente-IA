@@ -5,11 +5,19 @@ import { useNavigate } from "react-router-dom";
 const surveyQuestions = [
   {
     question: "¿Cuál es tu objetivo financiero principal?",
-    options: ["Ahorro", "Inversión", "Deudas", "Retiro"],
+    options: ["Ahorro", "Inversión", "Deudas", "Otro"],
   },
   {
     question: "¿Cuál es tu nivel de experiencia en finanzas?",
     options: ["Principiante", "Intermedio", "Avanzado"],
+  },
+  {
+     question: "¿Cuánto podrías ahorrar o invertir mensualmente?",
+     options: ["Menos de $100", "Entre $100 y $500", "Entre $500 y $1000", "Más de $1000"],
+   },
+  {
+    question: "¿Cuál es tu capital disponible actualmente?",
+    options: ["Menos de $1,000", "Entre $1,000 y $5,000", "Entre $5,000 y $10,000", "Más de $10,000"],
   },
   {
     question: "¿Prefieres estrategias a corto o largo plazo?",

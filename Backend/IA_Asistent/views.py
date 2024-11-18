@@ -106,3 +106,143 @@ def consulta_chatgpt(request):
         return Response({"respuesta": respuesta_texto}, status=200)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+    
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def save_financial_asset(request):
+    user = request.user
+    data = request.data
+
+    # Guarda o actualiza el activo financiero en el modelo
+    asset, created = FinancialAsset.objects.update_or_create(
+        user=user,
+        name=data.get('name'),
+        defaults={
+            'type': data.get('type'),
+            'value': data.get('value'),
+            'category': data.get('category', None)  # Opcional, por si no se incluye
+        }
+    )
+
+    if created:
+        return Response({'message': 'Activo guardado correctamente', 'asset_id': asset.id}, status=status.HTTP_201_CREATED)
+    else:
+        return Response({'message': 'Activo actualizado correctamente', 'asset_id': asset.id}, status=status.HTTP_200_OK)
+
+
+
+
+# Views para los pasivos
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def list_liabilities(request):
+    """Listar todos los pasivos del usuario autenticado."""
+    liabilities = FinancialLiability.objects.filter(user=request.user)
+    serializer = FinancialLiabilitySerializer(liabilities, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def create_liability(request):
+    user = request.user
+    data = request.data
+
+    # Guarda o actualiza el activo financiero en el modelo
+    asset, created = FinancialLiability.objects.update_or_create(
+        user=user,
+        name=data.get('name'),
+        defaults={
+            'type': data.get('type'),
+            'amount': data.get('amount'),
+            'due_date': data.get('due_date', None)  # Opcional, por si no se incluye
+        }
+    )
+
+    if created:
+        return Response({'message': 'Pasivo guardado correctamente', 'asset_id': asset.id}, status=status.HTTP_201_CREATED)
+    else:
+        return Response({'message': 'Pasivo actualizado correctamente', 'asset_id': asset.id}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def retrieve_liability(request, pk):
+    """Obtener los detalles de un pasivo específico por su ID."""
+    try:
+        liability = FinancialLiability.objects.get(pk=pk, user=request.user)
+    except FinancialLiability.DoesNotExist:
+        return Response({"error": "Liability not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = FinancialLiabilitySerializer(liability)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['PUT'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def update_liability(request, pk):
+    """Actualizar un pasivo financiero existente."""
+    try:
+        liability = FinancialLiability.objects.get(pk=pk, user=request.user)
+    except FinancialLiability.DoesNotExist:
+        return Response({"error": "Liability not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    data = request.data
+    serializer = FinancialLiabilitySerializer(liability, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_liability(request, pk):
+    """Eliminar un pasivo financiero."""
+    try:
+        liability = FinancialLiability.objects.get(pk=pk, user=request.user)
+    except FinancialLiability.DoesNotExist:
+        return Response({"error": "Liability not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    liability.delete()
+    return Response({"message": "Liability deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+#------------------------------------------------------------------------------
+#views para finance
+from django.db.models import Sum
+
+@api_view(['POST'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def update_current_balance(request):
+    user = request.user  # Obtener el usuario autenticado
+    
+    # Sumar los valores de los activos y pasivos del usuario
+    total_assets = FinancialAsset.objects.filter(user=user).aggregate(Sum('value'))['value__sum'] or 0
+    total_liabilities = FinancialLiability.objects.filter(user=user).aggregate(Sum('amount'))['amount__sum'] or 0
+
+    # Calcular el balance actual
+    current_balance = total_assets - total_liabilities
+
+    # Obtener o crear el registro de Finance
+    finance, created = Finance.objects.get_or_create(user=user)
+
+    # Asegurarse de asignar siempre un valor a current_balance
+    finance.current_balance = current_balance
+    finance.save()
+
+    return Response({
+        'message': 'Current balance updated successfully.',
+        'current_balance': float(finance.current_balance),
+        'total_assets': float(total_assets),
+        'total_liabilities': float(total_liabilities),
+    })
