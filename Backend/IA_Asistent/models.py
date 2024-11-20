@@ -41,10 +41,10 @@ class DailySuggestion(models.Model):
 
 class Finance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    current_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # Saldo actual
-    total_income = models.DecimalField(max_digits=10, decimal_places=2)     # Total ingresos
-    total_expenses = models.DecimalField(max_digits=10, decimal_places=2)   # Total gastos
-    budget = models.DecimalField(max_digits=10, decimal_places=2)           # Presupuesto	
+    current_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)  # Saldo actual
+    total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)     # Total ingresos
+    total_expenses = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)   # Total gastos
+    budget = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)           # Presupuesto	
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -62,10 +62,10 @@ class SurveyResponse(models.Model):
 
 class FinancialAsset(models.Model):
     TYPE_CHOICES = [
-        ('bank_account', 'Bank Account'),
-        ('investment', 'Investment'),
-        ('fixed_asset', 'Fixed Asset'),
-        ('other', 'Other'),
+        ('Cuenta Bancaria', 'cuenta bancaria'),
+        ('Inversión', 'inversión'),
+        ('Activo Fijo', 'activo fijo'),
+        ('Otro', 'otro'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relación con el usuario
@@ -82,9 +82,10 @@ class FinancialAsset(models.Model):
 
 class FinancialLiability(models.Model):
     TYPE_CHOICES = [
-        ('short_term_debt', 'Short Term Debt'),
-        ('long_term_debt', 'Long Term Debt'),
-        ('liability', 'Liability'),
+        ('Deuda a Corto Plazo', 'deuda a corto plazo'),
+        ('Deuda a Largo Plazo', 'deuda a largo plazo'),
+        ('Responsibilidad', 'responsabilidad'),
+        ('Pasivo', 'pasivo'),
     ]
     
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Relación con el usuario

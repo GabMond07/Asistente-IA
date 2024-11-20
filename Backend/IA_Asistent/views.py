@@ -107,6 +107,32 @@ def consulta_chatgpt(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
     
+#------------------------------------------------------------------------------------------------------------
+from django.core.cache import cache
+
+#Activos Financieros listado
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def list_assets(request):
+
+    # Usar una clave única basada en el usuario
+    cache_key = f"assets_user_{request.user.id}"
+    cached_assets = cache.get(cache_key)
+
+    if cached_assets:
+        # Si los datos están en caché, devolverlos directamente
+        return Response(cached_assets, status=status.HTTP_200_OK)
+
+    assets = FinancialAsset.objects.filter(user=request.user)
+    serializer = FinancialAssetSerializer(assets, many=True)
+    serialized_data = serializer.data
+
+    cache.set(cache_key, serialized_data, timeout=60*60)
+    print(cache._cache.keys())
+    return Response(serialized_data, status=status.HTTP_200_OK)
+
+#crear activo
 @api_view(['POST'])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -114,7 +140,6 @@ def save_financial_asset(request):
     user = request.user
     data = request.data
 
-    # Guarda o actualiza el activo financiero en el modelo
     asset, created = FinancialAsset.objects.update_or_create(
         user=user,
         name=data.get('name'),
@@ -130,9 +155,64 @@ def save_financial_asset(request):
     else:
         return Response({'message': 'Activo actualizado correctamente', 'asset_id': asset.id}, status=status.HTTP_200_OK)
 
+#Obtener activo por ID
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def retrieve_asset(request, pk):
+    try:
+        asset = FinancialAsset.objects.get(pk=pk, user=request.user)
+    except FinancialAsset.DoesNotExist:
+        return Response({"error": "Asset not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    serializer = FinancialAssetSerializer(asset)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+#Modificar activo
+@api_view(['PUT'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def update_asset(request, pk):
+    try:
+        asset = FinancialAsset.objects.get(pk=pk, user=request.user)
+    except FinancialAsset.DoesNotExist:
+        return Response({"error": "Asset not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    data = request.data
+    serializer = FinancialAssetSerializer(asset, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#Eliminar activo
+@api_view(['DELETE'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def delete_asset(request, pk):
+    try:
+        asset = FinancialAsset.objects.get(pk=pk, user=request.user)
+    except FinancialAsset.DoesNotExist:
+        return Response({"error": "Asset not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    asset.delete()
+    return Response({"message": "Asset deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+#------------------------------------------------------------------------------------------------------------
 # Views para los pasivos
 @api_view(['GET'])
 @authentication_classes([TokenAuthentication])

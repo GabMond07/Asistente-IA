@@ -25,11 +25,17 @@ urlpatterns = [
     path('Logout/', views.logout),
     path('survey/', views.save_survey_responses),
     path('api/consulta-chatgpt/', views.consulta_chatgpt, name='consulta_chatgpt'),
+
     #Total Activos - Pasivos
     path('update-current-balance/', views.update_current_balance, name='update_current_balance'),
 
     #activos
-    path('api/save-financial-asset/', views.save_financial_asset, name='save_financial_asset'),
+    path('list-assets/', views.list_assets, name='list_assets'),
+    path('save-financial-asset/', views.save_financial_asset, name='save_financial_asset'),
+    path('asset/<int:pk>/', views.retrieve_asset, name='retrieve_asset'),
+    path('asset/<int:pk>/update/', views.update_asset, name='update_asset'),
+    path('asset/<int:pk>/delete/', views.delete_asset, name='delete_asset'),
+    
     # Pasivos
     path('liabilities/', views.list_liabilities, name='list_liabilities'),
     path('liabilities/create/', views.create_liability, name='create_liability'),

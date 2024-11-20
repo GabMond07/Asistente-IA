@@ -1,11 +1,13 @@
 import { Navigation } from "../Components/Navigation";
 import Sidebar from "../Components/Sidebar";
-import Nube from "../assets/Nube.svg";
-import CloudNote from "../Components/cloudNote";
+import React, { useEffect, useState } from "react";
 
-import React from "react";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../Components/Dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "../Components/Dialog";
 import { Button } from "../Components/ButtonAsset";
 import {
   Card,
@@ -54,58 +56,190 @@ import {
   FileText,
   Bell,
   Plus,
+  HandCoins,
+  MoreHorizontal,
+  Hand,
+  FileMinus,
+  AlertCircle,
+  MinusCircle,
+  Archive,
 } from "lucide-react";
-
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8040"];
 
-const capitalData = [
-  { name: "Ene", valor: 100000 },
-  { name: "Feb", valor: 120000 },
-  { name: "Mar", valor: 115000 },
-  { name: "Abr", valor: 130000 },
-  { name: "May", valor: 140000 },
-  { name: "Jun", valor: 55000 },
-  { name: "Jul", valor: 55000 },
-
-];
-
-const distribucionActivos = [
-  { name: "Ahorros", value: 30 },
-  { name: "Inversiones", value: 40 },
-  { name: "Inmuebles", value: 20 },
-  { name: "Otros", value: 10 },
-];
-
 const Dashboard = () => {
+  // -------------------------------------------------------------------------------- //
+  // Estados para guardar los datos de la cuenta
+  // -------------------------------------------------------------------------------- //
 
-  const [formData, setFormData] = useState({
-    name: "",
-    type: "",
-    value: "",
-    category: "",
+  const [balance, setBalance] = useState(null); // Estado para guardar el balance
+  const [totalAssets, setTotalAssets] = useState(null); // Estado para guardar el total de activos
+  const [percentageChange, setPercentageChange] = useState(null); // Cambio porcentual
+
+  useEffect(() => {
+    // Función para obtener datos del backend
+    const fetchBalance = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/update-current-balance/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Token ${localStorage.getItem("token")}`, // Reemplaza con tu token
+            },
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          // Actualiza el estado con los datos del backend
+          setBalance(data.current_balance);
+          setTotalAssets(data.total_assets);
+          setPercentageChange(data.percentage_change); // Supongamos que la API devuelve esto
+        } else {
+          console.error("Error al obtener el balance:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error de conexión:", error);
+      }
+    };
+
+    fetchBalance(); // Llamada a la función
+  }, []); // Se ejecuta una vez cuando el componente se monta
+
+  // -------------------------------------------------------------------------------- //
+  // Función para obtener el total de pasivos
+  // -------------------------------------------------------------------------------- //
+
+  const iconMap = {
+    "Deuda a Corto Plazo": <FileMinus className="inline mr-2" />,
+    "Deuda a Largo Plazo": <Archive className="inline mr-2" />,
+    Responsibilidad: <AlertCircle className="inline mr-2" />,
+    Pasivo: <MinusCircle className="inline mr-2" />,
+  };
+
+  const [liabilities, setLiabilities] = useState([]); // Estado para almacenar los pasivos
+
+  useEffect(() => {
+    // Función para obtener los pasivos
+    const fetchLiabilities = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/liabilities/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${localStorage.getItem("token")}`, // Reemplaza con tu token
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setLiabilities(data); // Supongamos que la API devuelve un arreglo llamado `liabilities`
+        } else {
+          console.error("Error al obtener los pasivos:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error de conexión:", error);
+      }
+    };
+
+    fetchLiabilities(); // Llama a la función
+  }, []); // Ejecuta una vez al montar el componente
+
+  // -------------------------------------------------------------------------------- //
+  // Función para obtener el total de pasivos
+  // -------------------------------------------------------------------------------- //
+
+  const iconMapAsset = {
+    "Cuenta Bancaria": <DollarSign className="inline mr-2" />,
+    Inversión: <Briefcase className="inline mr-2" />,
+    "Activo Fijo": <Diamond className="inline mr-2" />,
+    Otro: <Building className="inline mr-2" />,
+  };
+
+  const [asset, setAsset] = useState([]);
+  const [capitalData, setCapitalData] = useState([]);
+
+  useEffect(() => {
+    // Función para obtener los activos
+    const fetchAsset = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/list-assets/", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setAsset(data);
+
+          const processedData = data.reduce((acc, asset) => {
+            const month = new Date(asset.created_at).toLocaleString("default", {
+              month: "short",
+            }); 
+
+            const existing = acc.find((item) => item.name === month);
+
+            if (existing) {
+              existing.valor += parseFloat(asset.value);
+            } else {
+              acc.push({ name: month, valor: parseFloat(asset.value) });
+            }
+
+            return acc;
+          }, []);
+
+          // Ordenar los datos por mes (opcional)
+          const monthsOrder = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          processedData.sort(
+            (a, b) => monthsOrder.indexOf(a.name) - monthsOrder.indexOf(b.name)
+          );
+
+          setCapitalData(processedData);
+          localStorage.setItem("assets", JSON.stringify(processedData)); 
+
+        } else {
+          console.error("Error al obtener los activos:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error de conexión:", error);
+      }
+    };
+
+    fetchAsset(); // Llama a la función
+  }, []); // Ejecuta una vez al montar el componente
+
+  // -------------------------------------------------------------------------------- //
+  // Estados para guardar los datos de la cuenta
+  // Procesar los datos para agrupar por tipo y calcular los valores totales
+  const processedData = asset.reduce((acc, current) => {
+    const existing = acc.find((item) => item.name === current.type);
+    if (existing) {
+      existing.value += parseFloat(current.value);
+    } else {
+      acc.push({ name: current.type, value: parseFloat(current.value) });
+    }
+    return acc;
+  }, []);
+
+  // Asegurarnos de que si no hay activos de un tipo, se muestre como 0
+  const types = ["Cuenta Bancaria", "Inversión", "Activo Fijo", "Otro"]; 
+  const finalData = types.map((type) => {
+    const existingType = processedData.find((item) => item.name === type);
+    return existingType ? existingType : { name: type, value: 0 };
   });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Aquí llamas a tu API para guardar los datos
-    console.log("Form data submitted:", formData);
-    // Luego puedes limpiar el formulario:
-    setFormData({ name: "", type: "", value: "", category: "" });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  //console.log(finalData);
 
   return (
     <>
       <div className="ml-24 h-screen w-full">
         <Navigation />
         <Sidebar className="fixed left-0 top-0 h-full" />
-        <div className="flex-1 p-20 ml-12 flex flex-col" >
+        <div className="flex-1 p-20 ml-12 flex flex-col">
           <div className="container mx-auto p-4 space-y-4">
             <Card>
               <CardHeader>
@@ -117,18 +251,29 @@ const Dashboard = () => {
                     <h3 className="text-lg font-semibold mb-2">
                       Total de activos
                     </h3>
-                    <p className="text-3xl font-bold">$525,000</p>
-                    <div className="flex items-center text-green-500">
-                      <ArrowUpRight size={20} />
-                      <span>5.2% desde el mes pasado</span>
-                    </div>
+                    <p className="text-3xl font-bold">
+                      {totalAssets !== null
+                        ? `$${totalAssets.toLocaleString()}` || "0"
+                        : "Cargando..."}
+                    </p>
+                    {percentageChange !== null && (
+                      <div className="flex items-center text-green-500">
+                        <ArrowUpRight size={20} />
+                        <span>{percentageChange} % desde el mes pasado</span>
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold mb-2">Valor neto</h3>
-                    <p className="text-3xl font-bold">$450,000</p>
+
+                    <p className="text-3xl font-bold">
+                      {balance !== null
+                        ? `$${balance.toLocaleString()}`
+                        : "Cargando..."}
+                    </p>
                     <div className="flex items-center text-green-500">
                       <ArrowUpRight size={20} />
-                      <span>3.8% desde el mes pasado</span>
+                      <span>{percentageChange} % desde el mes pasado</span>
                     </div>
                   </div>
                 </div>
@@ -139,15 +284,16 @@ const Dashboard = () => {
                   <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
                       <Pie
-                        data={distribucionActivos}
+                        data={finalData}
+                        dataKey="value"
+                        nameKey="name"
                         cx="50%"
                         cy="50%"
                         labelLine={false}
                         outerRadius={80}
                         fill="#8884d8"
-                        dataKey="value"
                       >
-                        {distribucionActivos.map((entry, index) => (
+                        {finalData.map((entry, index) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={COLORS[index % COLORS.length]}
@@ -200,46 +346,30 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        <TableRow>
-                          <TableCell>
-                            <DollarSign className="inline mr-2" />
-                            Cuenta Bancaria
-                          </TableCell>
-                          <TableCell>Cuenta de Ahorros</TableCell>
-                          <TableCell>$50,000</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Briefcase className="inline mr-2" />
-                            Inversión
-                          </TableCell>
-                          <TableCell>Acciones Tecnológicas</TableCell>
-                          <TableCell>$100,000</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Home className="inline mr-2" />
-                            Activo Fijo
-                          </TableCell>
-                          <TableCell>Casa</TableCell>
-                          <TableCell>$300,000</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Car className="inline mr-2" />
-                            Activo Fijo
-                          </TableCell>
-                          <TableCell>Automóvil</TableCell>
-                          <TableCell>$25,000</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Diamond className="inline mr-2" />
-                            Otro Activo
-                          </TableCell>
-                          <TableCell>Joyas</TableCell>
-                          <TableCell>$50,000</TableCell>
-                        </TableRow>
+                        {asset.length > 0 ? (
+                          asset.map((assets, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                {iconMapAsset[assets.type] || (
+                                  <CreditCard className="inline mr-2" />
+                                )}
+                                {assets.type} {/* Tipo de pasivo */}
+                              </TableCell>
+                              <TableCell>{assets.name}</TableCell>
+                              {/* Descripción */}
+                              <TableCell>
+                                ${assets.value.toLocaleString()}
+                              </TableCell>
+                              {/* Monto */}
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3} align="center">
+                              Sin activos...
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </CardContent>
@@ -260,30 +390,30 @@ const Dashboard = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        <TableRow>
-                          <TableCell>
-                            <CreditCard className="inline mr-2" />
-                            Deuda a Corto Plazo
-                          </TableCell>
-                          <TableCell>Tarjeta de Crédito</TableCell>
-                          <TableCell>$5,000</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <Building className="inline mr-2" />
-                            Deuda a Largo Plazo
-                          </TableCell>
-                          <TableCell>Hipoteca</TableCell>
-                          <TableCell>$200,000</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell>
-                            <GraduationCap className="inline mr-2" />
-                            Deuda a Largo Plazo
-                          </TableCell>
-                          <TableCell>Préstamo Estudiantil</TableCell>
-                          <TableCell>$20,000</TableCell>
-                        </TableRow>
+                        {liabilities.length > 0 ? (
+                          liabilities.map((liability, index) => (
+                            <TableRow key={index}>
+                              <TableCell>
+                                {iconMap[liability.type] || (
+                                  <CreditCard className="inline mr-2" />
+                                )}
+                                {liability.type} {/* Tipo de pasivo */}
+                              </TableCell>
+                              <TableCell>{liability.name}</TableCell>
+                              {/* Descripción */}
+                              <TableCell>
+                                ${liability.amount.toLocaleString()}
+                              </TableCell>{" "}
+                              {/* Monto */}
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={3} align="center">
+                              Sin pasivos...
+                            </TableCell>
+                          </TableRow>
+                        )}
                       </TableBody>
                     </Table>
                   </CardContent>
