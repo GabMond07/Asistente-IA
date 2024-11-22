@@ -57,19 +57,12 @@ function Chat() {
 
   return (
     <>
-      <div className="ml-6 h-screen w-full">
+      <div className="ml-24 h-screen w-full">
         <Navigation />
         <Sidebar className="fixed left-0 top-0 h-full" />
-
-        <div className="flex-1 flex flex-col mr-2">
-          {/* Contenedor principal */}
-          <div className="flex flex-col flex-1 ml-56 pt-24 mr-5 space-y-4 ">
-            {" "}
-            {/* Ajuste de margen y padding para respetar navbar y sidebar */}
-            <div className="flex h-[calc(100vh-6rem)] bg-gray-100 p-4 ">
-              {" "}
-              {/* Ajusta la altura restando el navbar */}
-              {/* Sidebar de historial */}
+        <div className="flex-1 p-20 ml-12 flex flex-col">
+          <div className="container mx-auto p-5 space-y-4 ">
+            <div className="flex h-[calc(90vh-6rem)] bg-gray-100 p-4 shadow rounded-lg">
               <div className="w-64 bg-white p-4 border-r overflow-hidden">
                 <h2 className="text-lg font-semibold mb-4 over">Historial</h2>
                 <ScrollArea className="h-full">

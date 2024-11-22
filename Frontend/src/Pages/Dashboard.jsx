@@ -63,6 +63,9 @@ import {
   AlertCircle,
   MinusCircle,
   Archive,
+  PlusCircle,
+  Edit,
+  Trash,
 } from "lucide-react";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8040"];
@@ -180,7 +183,7 @@ const Dashboard = () => {
           const processedData = data.reduce((acc, asset) => {
             const month = new Date(asset.created_at).toLocaleString("default", {
               month: "short",
-            }); 
+            });
 
             const existing = acc.find((item) => item.name === month);
 
@@ -194,14 +197,26 @@ const Dashboard = () => {
           }, []);
 
           // Ordenar los datos por mes (opcional)
-          const monthsOrder = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+          const monthsOrder = [
+            "Ene",
+            "Feb",
+            "Mar",
+            "Abr",
+            "May",
+            "Jun",
+            "Jul",
+            "Ago",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dic",
+          ];
           processedData.sort(
             (a, b) => monthsOrder.indexOf(a.name) - monthsOrder.indexOf(b.name)
           );
 
           setCapitalData(processedData);
-          localStorage.setItem("assets", JSON.stringify(processedData)); 
-
+          localStorage.setItem("assets", JSON.stringify(processedData));
         } else {
           console.error("Error al obtener los activos:", response.statusText);
         }
@@ -227,12 +242,137 @@ const Dashboard = () => {
   }, []);
 
   // Asegurarnos de que si no hay activos de un tipo, se muestre como 0
-  const types = ["Cuenta Bancaria", "Inversión", "Activo Fijo", "Otro"]; 
+  const types = ["Cuenta Bancaria", "Inversión", "Activo Fijo", "Otro"];
   const finalData = types.map((type) => {
     const existingType = processedData.find((item) => item.name === type);
     return existingType ? existingType : { name: type, value: 0 };
   });
-  //console.log(finalData);
+
+  // Función para obtener las recomendaciones del asistente
+  const [data, setData] = useState({
+    current_balance: null,
+    total_assets: null,
+    assistant_suggestion: "",
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Llamada a la API
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/api/get-recommendations/",
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos de la API");
+        }
+
+        const result = await response.json();
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (error) {
+    return <p>Error: {error}</p>;
+  }
+
+  const { current_balance, total_assets, assistant_suggestion } = data;
+
+  // Analisis de Riesgo
+  const [data_analisis, setDataAnalisis] = useState({
+    assistant_suggestion_anal: "",
+  });
+  const [errors, setErrors] = useState(null);
+  const [loadings, setLoadings] = useState(true);
+  useEffect(() => {
+    // Llamada a la API
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/api/get-analitics/",
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos de la API");
+        }
+
+        const result = await response.json();
+        setDataAnalisis(result);
+      } catch (err) {
+        setErrors(err.message);
+      } finally {
+        setLoading_(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (errors) {
+    return <p>Error: {errors}</p>;
+  }
+
+  const { assistant_suggestion_anal } = data_analisis;
+
+  // Pago de deuda
+  const [data_deuda, setDataDeuda] = useState({
+    assistant_suggestion_debt: "",
+  });
+  const [error_, setError_] = useState(null);
+  const [loading_, setLoading_] = useState(true);
+  useEffect(() => {
+    // Llamada a la API
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/api/get-debt-payment/",
+          {
+            headers: {
+              Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error al obtener los datos de la API");
+        }
+
+        const result = await response.json();
+        setDataDeuda(result);
+      } catch (err) {
+        setError_(err.message);
+      } finally {
+        setLoading_(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (error_) {
+    return <p>Error: {error_}</p>;
+  }
+
+  const { assistant_suggestion_debt } = data_deuda;
 
   return (
     <>
@@ -334,7 +474,12 @@ const Dashboard = () => {
               <TabsContent value="cuentas">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Cuentas y Activos</CardTitle>
+                    <div className="flex justify-between mb-3">
+                      <CardTitle>Cuentas y Activos</CardTitle>
+                      <button className="flex items-end justify-center mr-20 p-1 hover:bg-gray-200 rounded-full cursor-pointer ">
+                        <PlusCircle className="inline mr-2" /> Añadir
+                      </button>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Table>
@@ -343,6 +488,9 @@ const Dashboard = () => {
                           <TableHead>Tipo</TableHead>
                           <TableHead>Descripción</TableHead>
                           <TableHead>Valor</TableHead>
+                          <TableHead className={"flex justify-center"}>
+                            Acción
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -359,6 +507,18 @@ const Dashboard = () => {
                               {/* Descripción */}
                               <TableCell>
                                 ${assets.value.toLocaleString()}
+                              </TableCell>
+                              <TableCell
+                                className={"flex flex-col justify-center"}
+                              >
+                                <div className="flex justify-center mb-2 gap-x-2">
+                                  <button className="flex items-center justify-center">
+                                    <Edit className="inline hover:bg-gray-300 rounded-md cursor-pointer" />
+                                  </button>
+                                  <button className="flex items-center justify-center">
+                                    <Trash className="inline hover:bg-gray-300 rounded-md cursor-pointer" />
+                                  </button>
+                                </div>
                               </TableCell>
                               {/* Monto */}
                             </TableRow>
@@ -378,7 +538,13 @@ const Dashboard = () => {
               <TabsContent value="deudas">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Deudas y Pasivos</CardTitle>
+                    <div className="flex justify-between mb-3">
+                      <CardTitle>Deudas y Pasivos</CardTitle>
+                      <button className="flex items-end justify-center mr-20 p-1 hover:bg-gray-200 rounded-full cursor-pointer">
+                        <PlusCircle className="inline mr-2" />
+                        Añadir
+                      </button>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <Table>
@@ -387,6 +553,9 @@ const Dashboard = () => {
                           <TableHead>Tipo</TableHead>
                           <TableHead>Descripción</TableHead>
                           <TableHead>Monto</TableHead>
+                          <TableHead className={"flex justify-center mr-1"}>
+                            Acción
+                          </TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -405,6 +574,18 @@ const Dashboard = () => {
                                 ${liability.amount.toLocaleString()}
                               </TableCell>{" "}
                               {/* Monto */}
+                              <TableCell
+                                className={"flex flex-col justify-center"}
+                              >
+                                <div className="flex justify-center mb-2 gap-x-2 mr-1">
+                                  <button className="flex items-center justify-center">
+                                    <Edit className="inline hover:bg-gray-300 rounded-md cursor-pointer" />
+                                  </button>
+                                  <button className="flex items-center justify-center">
+                                    <Trash className="inline hover:bg-gray-300 rounded-md cursor-pointer" />
+                                  </button>
+                                </div>
+                              </TableCell>
                             </TableRow>
                           ))
                         ) : (
@@ -430,10 +611,13 @@ const Dashboard = () => {
                         <h3 className="text-lg font-semibold mb-2 flex items-center">
                           <AlertTriangle className="mr-2" /> Análisis de Riesgo
                         </h3>
-                        <Progress value={60} className="w-full" />
+                        <Progress value={100} className="w-full" />
                         <p className="mt-2">
-                          Tu perfil de riesgo es moderado. Considera
-                          diversificar más tus inversiones.
+                          Tu saldo actual es de <b>${current_balance}</b> y el
+                          total de tus activos es <b>${total_assets}</b>.
+                        </p>
+                        <p style={{ whiteSpace: "pre-line" }}>
+                          {assistant_suggestion_anal}
                         </p>
                       </div>
                       <div>
@@ -441,24 +625,17 @@ const Dashboard = () => {
                           <TrendingUp className="mr-2" /> Recomendaciones de
                           Inversión
                         </h3>
-                        <ul className="list-disc list-inside">
-                          <li>Aumenta tu inversión en fondos indexados</li>
-                          <li>
-                            Considera añadir bonos a tu cartera para equilibrar
-                            el riesgo
-                          </li>
-                          <li>Explora oportunidades en mercados emergentes</li>
-                        </ul>
+                        <p style={{ whiteSpace: "pre-line" }}>
+                          {assistant_suggestion}
+                        </p>
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold mb-2 flex items-center">
                           <ArrowDownRight className="mr-2" /> Plan de Pago de
                           Deudas
                         </h3>
-                        <p>
-                          Prioriza el pago de tu tarjeta de crédito. Considera
-                          refinanciar tu hipoteca para obtener una mejor tasa de
-                          interés.
+                        <p style={{ whiteSpace: "preserve-breaks" }}>
+                          {assistant_suggestion_debt}
                         </p>
                       </div>
                     </div>
@@ -466,7 +643,6 @@ const Dashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <ButtonDashboard
                 variant="outline"

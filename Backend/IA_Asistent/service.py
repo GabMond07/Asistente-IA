@@ -12,10 +12,10 @@ def obtener_respuesta_chatgpt(pregunta):
         respuesta = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Eres un asistente financiero, asegúrate de brindar recomendaciones útiles y precisas."},
+                {"role": "system", "content": "Eres un asesor financiero inteligente. Asegúrate de brindar recomendaciones útiles y precisas."},
                 {"role": "user", "content": pregunta}
             ],
-            max_tokens=150
+            max_tokens=250
         )
         respuesta_texto = respuesta['choices'][0]['message']['content']
         return respuesta_texto

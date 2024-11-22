@@ -25,6 +25,9 @@ urlpatterns = [
     path('Logout/', views.logout),
     path('survey/', views.save_survey_responses),
     path('api/consulta-chatgpt/', views.consulta_chatgpt, name='consulta_chatgpt'),
+    path('api/get-recommendations/', views.get_recommendations, name='get_recommendations'),
+    path('api/get-analitics/', views.get_analitics, name='get_analitics'),
+    path('api/get-debt-payment/', views.get_debt_payment, name='get_debt_payment'),
 
     #Total Activos - Pasivos
     path('update-current-balance/', views.update_current_balance, name='update_current_balance'),

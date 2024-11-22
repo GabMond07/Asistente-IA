@@ -28,16 +28,30 @@ class ChatHistory(models.Model):
 
 class DailySuggestion(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    content = models.TextField() 
-    relevance = models.CharField(
-        max_length=10,
-        choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')]
-    )
+    user_message = models.TextField(default="")
+    assistant_seggestion = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Suggestion for {self.user.username} - {self.relevance}"
+        return f"Chat on {self.created_at} By {self.user.username}"
 
+class Analitycs(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_message = models.TextField(default="")
+    assistant_seggestion = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat on {self.created_at} By {self.user.username}"
+
+class DebtPayment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_message = models.TextField(default="")
+    assistant_seggestion = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Chat on {self.created_at} By {self.user.username}"
 
 class Finance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
