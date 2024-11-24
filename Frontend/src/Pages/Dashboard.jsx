@@ -1,6 +1,9 @@
 import { Navigation } from "../Components/Navigation";
 import Sidebar from "../Components/Sidebar";
 import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+
 
 import {
   Dialog,
@@ -374,6 +377,53 @@ const Dashboard = () => {
 
   const { assistant_suggestion_debt } = data_deuda;
 
+  // CRUD para activos ------------------------------------------------------------------------------------
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  const { handleSubmit, register, reset } = useForm(); // Incluye `register` para manejar inputs
+
+  const toggleForm = () => {
+    setIsFormOpen(!isFormOpen);
+  };
+
+  const [formData, setFormData] = useState({
+    name: "",
+    type: "",
+    value: "",
+  });
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem("token"); // Obtén el token desde el almacenamiento local
+
+    try {
+      const response = await fetch("http://localhost:8000/save-financial-asset/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al guardar el activo");
+      }
+
+      const result = await response.json();
+      console.log("Activo guardado:", result);
+      toggleForm(); // Cierra el formulario tras guardar
+    } catch (error) {
+      console.error("Error al enviar el formulario:", error.message);
+    }
+  };
+
   return (
     <>
       <div className="ml-24 h-screen w-full">
@@ -476,10 +526,89 @@ const Dashboard = () => {
                   <CardHeader>
                     <div className="flex justify-between mb-3">
                       <CardTitle>Cuentas y Activos</CardTitle>
-                      <button className="flex items-end justify-center mr-20 p-1 hover:bg-gray-200 rounded-full cursor-pointer ">
+                      <button 
+                      onClick={toggleForm}
+                      className="flex items-end justify-center mr-20 p-1 hover:bg-gray-200 rounded-full cursor-pointer ">
                         <PlusCircle className="inline mr-2" /> Añadir
                       </button>
                     </div>
+                    {isFormOpen && (
+                      <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
+                      <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+                        <h2 className="text-lg font-semibold mb-4">Añadir nuevo activo</h2>
+                        <form onSubmit={onSubmit}>
+                          {/* Campo Nombre */}
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Nombre del activo
+                            </label>
+                            <input
+                              type="text"
+                              name="name"
+                              value={formData.name}
+                              onChange={onChange}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                              placeholder="Ejemplo: Casa, Vehículo"
+                              required
+                            />
+                          </div>
+                
+                          {/* Campo Tipo */}
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Tipo de activo
+                            </label>
+                            <select
+                              name="type"
+                              value={formData.type}
+                              onChange={onChange}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                              required
+                            >
+                              <option value="">Selecciona un tipo</option>
+                              <option value="Cuenta Bancaria">Cuenta Bancaria</option>
+                              <option value="Inversión">Inversión</option>
+                              <option value="Activo Fijo">Activo Fijo</option>
+                              <option value="Otro">Otro</option>
+                            </select>
+                          </div>
+                
+                          {/* Campo Valor */}
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">
+                              Valor del activo
+                            </label>
+                            <input
+                              type="number"
+                              name="value"
+                              value={formData.value}
+                              onChange={onChange}
+                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+                              placeholder="Ejemplo: 100000"
+                              step="0.01"
+                              required
+                            />
+                          </div>
+                
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={toggleForm}
+                              className="mr-2 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="submit"
+                              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                            >
+                              Guardar
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <Table>

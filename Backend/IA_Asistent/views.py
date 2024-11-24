@@ -504,7 +504,7 @@ def get_debt_payment(request):
         Tengo un Capital Neto de {current_balance}, total de mis activos son {total_assets} mientras
         que mi total de pasivos son {total_liabilities}.
         considera que tengo {name_liabilities} que debo pagar.
-        Porfavor, Proporciona una recomendacion personalizada sobre como pagar las deudas, en menos de 200 palabras.
+        Porfavor, Proporciona una recomendacion personalizada sobre como pagar las deudas, en menos de 250 palabras.
         """
 
         assistant_suggestion_debt = obtener_respuesta_chatgpt(prompt).replace("\\n", "\n")
