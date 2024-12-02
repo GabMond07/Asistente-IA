@@ -15,7 +15,7 @@ def obtener_respuesta_chatgpt(pregunta):
                 {"role": "system", "content": "Eres un asesor financiero inteligente. Asegúrate de brindar recomendaciones útiles y precisas."},
                 {"role": "user", "content": pregunta}
             ],
-            max_tokens=250
+            max_tokens=1000
         )
         respuesta_texto = respuesta['choices'][0]['message']['content']
         return respuesta_texto

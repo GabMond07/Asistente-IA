@@ -69,7 +69,7 @@ class Finance(models.Model):
 class SurveyResponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     responses = models.JSONField()  # Aquí se guardarán las respuestas en formato JSON
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)    
 
     def __str__(self):
         return f"Respuestas de {self.user.username}"

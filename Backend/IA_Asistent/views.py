@@ -336,13 +336,12 @@ def get_recommendations(request):
                 "total_liabilities": total_liabilities,
                 "assistant_suggestion": "Añade tus activos y pasivos para obtener recomendaciones personalizadas.",
             })
-
-
+        '''
         # Buscar el último registro en la base de datos para este usuario
         last_suggestion = DailySuggestion.objects.filter(user=user).order_by('-created_at').first()
 
         # Verificar si ya existe un registro con el mismo current_balance
-        if last_suggestion and finance.current_balance == current_balance:
+        if finance.current_balance == current_balance:
             return Response({
                 "message": "Datos previamente generados.",
                 "current_balance": current_balance,
@@ -350,7 +349,7 @@ def get_recommendations(request):
                 "total_liabilities": total_liabilities,
                 "assistant_suggestion": last_suggestion.assistant_seggestion,
             })
-
+        '''
         # Preparar datos para enviar a OpenAI
         prompt = f"""
         El usuario tiene un Capital Neto de {current_balance}, su total de activos están valorados en {total_assets} mientras
@@ -410,7 +409,7 @@ def get_analitics(request):
                 "assistant_suggestion_anal": "Te daré recomendaciones personalizadas cuando tengas tus activos y pasivos ingresados!.",
             })
 
-
+        '''
         # Buscar el último registro en la base de datos para este usuario
         last_suggestion = Analitycs.objects.filter(user=user).order_by('-created_at').first()
 
@@ -423,7 +422,7 @@ def get_analitics(request):
                 "total_liabilities": total_liabilities,
                 "assistant_suggestion_anal": last_suggestion.assistant_seggestion,
             })
-
+        '''
         # Preparar datos para enviar a OpenAI
         prompt = f"""
         Tengo un Capital Neto de {current_balance}, total de mis activos están valorados en {total_assets} mientras
@@ -485,7 +484,7 @@ def get_debt_payment(request):
                 "assistant_suggestion_debt": "Te daré recomendaciones personalizadas cuando tenga tus datos ingresados!.",
             })
 
-
+        '''
         # Buscar el último registro en la base de datos para este usuario
         last_suggestion = DebtPayment.objects.filter(user=user).order_by('-created_at').first()
 
@@ -498,7 +497,7 @@ def get_debt_payment(request):
                 "total_liabilities": total_liabilities,
                 "assistant_suggestion_debt": last_suggestion.assistant_seggestion,
             })
-
+        '''
         # Preparar datos para enviar a OpenAI
         prompt = f"""
         Tengo un Capital Neto de {current_balance}, total de mis activos son {total_assets} mientras
