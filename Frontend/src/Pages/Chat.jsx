@@ -1,6 +1,6 @@
 // chat.jsx
 import { Send, PenSquare, Paperclip, Bot } from "lucide-react";
-import { Button } from "../components/Button";
+import { Button } from "../Components/Button";
 import { Textarea } from "../Components/Textarea";
 import { ScrollArea } from "../Components/Scrollarea";
 import { Avatar, AvatarFallback, AvatarImage } from "../Components/Avatar";
