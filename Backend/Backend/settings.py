@@ -82,9 +82,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'asistente',  
-        'USER': 'root',  
-        'PASSWORD': '1234', 
-        'HOST': 'localhost',
+        'USER': 'admin',  
+        'PASSWORD': '202157471', 
+        'HOST': 'asistente-ia.cd2wu4ye02c3.us-east-2.rds.amazonaws.com',
         'PORT': '3306',  
     }
 }

@@ -1,0 +1,41 @@
+services:
+  backend:
+    build:
+      context: ./backend  # Ruta al directorio del backend
+      dockerfile: Dockerfile  # Ruta al archivo Dockerfile (si no está en la raíz del directorio backend)
+    container_name: backend-financial-assistant
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "jdbc:mysql://asistente-ia.cd2wu4ye02c3.us-east-2.rds.amazonaws.com:3306/asistente"
+    depends_on:
+      - db
+    networks:
+      - financial-network
+
+  frontend:
+    build:
+      context: ./frontend  # Ruta al directorio del frontend
+      dockerfile: Dockerfile  # Ruta al archivo Dockerfile (si no está en la raíz del directorio frontend)
+    container_name: frontend-financial-assistant
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_BACKEND_URL: "http://backend:8000"
+    networks:
+      - financial-network
+
+  db:
+    image: mysql:5.7
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "202157471"
+      MYSQL_DATABASE: "asistente"
+    ports:
+      - "3306:3306"
+    networks:
+      - financial-network
+
+networks:
+  financial-network:
+    driver: bridge

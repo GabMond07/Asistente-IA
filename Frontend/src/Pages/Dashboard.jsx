@@ -69,6 +69,7 @@ import {
   Edit,
   Trash,
 } from "lucide-react";
+import { host } from "../api/api";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8040"];
 
@@ -86,7 +87,7 @@ const Dashboard = () => {
     const fetchBalance = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/update-current-balance/",
+          `http://${host}/update-current-balance/`,
           {
             method: "POST",
             headers: {
@@ -130,7 +131,7 @@ const Dashboard = () => {
     // Función para obtener los pasivos
     const fetchLiabilities = async () => {
       try {
-        const response = await fetch("http://localhost:8000/liabilities/", {
+        const response = await fetch(`http://${host}/liabilities/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -170,7 +171,7 @@ const Dashboard = () => {
     // Función para obtener los activos
     const fetchAsset = async () => {
       try {
-        const response = await fetch("http://localhost:8000/list-assets/", {
+        const response = await fetch(`http://${host}/list-assets/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -264,7 +265,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/api/get-recommendations/",
+          `http://${host}/api/get-recommendations/`,
           {
             headers: {
               Authorization: `Token ${localStorage.getItem("token")}`,
@@ -305,7 +306,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/api/get-analitics/",
+          `http://${host}/api/get-analitics/`,
           {
             headers: {
               Authorization: `Token ${localStorage.getItem("token")}`,
@@ -346,7 +347,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/api/get-debt-payment/",
+          `http://${host}/api/get-debt-payment/`,
           {
             headers: {
               Authorization: `Token ${localStorage.getItem("token")}`,
@@ -402,7 +403,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token"); // Obtén el token desde el almacenamiento local
 
     try {
-      const response = await fetch("http://localhost:8000/save-financial-asset/", {
+      const response = await fetch(`http://${host}/save-financial-asset/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

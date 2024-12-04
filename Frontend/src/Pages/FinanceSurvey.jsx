@@ -50,7 +50,7 @@ const FinanceSurvey = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/survey/", {
+      const response = await fetch(`http://${host}/survey/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
