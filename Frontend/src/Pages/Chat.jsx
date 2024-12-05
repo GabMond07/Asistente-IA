@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../Components/Avatar";
 import React, { useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import { Navigation } from "../Components/Navigation";
-import { host } from "../api/api";
+import { hostLocal } from "../api/api";
 
 function Chat() {
   const [pregunta, setPregunta] = useState(""); // Pregunta del usuario
@@ -22,7 +22,7 @@ function Chat() {
     setMessages([...messages, { role: "user", content: pregunta }]);
     try {
       const response = await fetch(
-        `http://${host}/api/consulta-chatgpt/`,
+        `http://${hostLocal}/api/consulta-chatgpt/`,
         { 
           method: "POST",
           headers: {
