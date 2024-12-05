@@ -261,12 +261,10 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Llamada a la API
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          `http://${host}/api/get-recommendations/`,
-          {
+        const response = await fetch( `http://${host}/api/get-recommendations/`, {
+          method: "GET",
             headers: {
               Authorization: `Token ${localStorage.getItem("token")}`,
             },

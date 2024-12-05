@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-!(m8jr&juru#vr!fv4@(xxw8mk&&2bb^95@#1$)8j=jp!%*%+9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['3.15.29.100', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -81,10 +81,14 @@ WSGI_APPLICATION = 'Backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'asistente',  
-        'USER': 'admin',  
-        'PASSWORD': '202157471', 
-        'HOST': 'asistente-ia.cd2wu4ye02c3.us-east-2.rds.amazonaws.com',
+        'NAME': 'asistente', 
+        'USER': 'root',
+        'PASSWORD': '1234',
+        'HOST': 'localhost',
+                #BD de AWS - RDS
+        #'USER': 'admin',  
+        #'PASSWORD': '202157471', 
+        #'HOST': 'asistente-ia.cd2wu4ye02c3.us-east-2.rds.amazonaws.com',
         'PORT': '3306',  
     }
 }
@@ -135,11 +139,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://3.15.29.100:5173"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://3.15.29.100:5173/"
 ]
 
 AUTH_USER_MODEL = 'IA_Asistent.User'

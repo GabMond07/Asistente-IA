@@ -2,7 +2,7 @@ import { Navigate, useNavigate, Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
-import { host } from "../api/api";
+import { hostLocal } from "../api/api";
 
 const Register = () => {
   const {
@@ -21,7 +21,7 @@ const Register = () => {
       setPasswordError("Las contraseñas no coinciden");
     } else {
       setPasswordError("");
-      fetch(`http://${host}/Register/`, {
+      fetch(`http://${hostLocal}/Register/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
