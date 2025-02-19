@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Navigation } from "../Components/Navigation";
 import { useNavigate } from "react-router-dom";
-import { hostLocal } from "../api/api";
+import { host } from "../api/api";
 
 const surveyQuestions = [
   {
@@ -51,7 +51,7 @@ const FinanceSurvey = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`http://${hostLocal}/survey/`, {
+      const response = await fetch(`http://${host}/survey/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
