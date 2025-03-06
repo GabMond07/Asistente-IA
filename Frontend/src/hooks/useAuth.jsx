@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { hostLocal } from "../api/api";
+import { host } from "../api/api";
 
 const AuthContext = createContext();
 
@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
 
   const signin = async (credentials) => {
     try {
-      const response = await fetch(`http://${hostLocal}/Login/`, {
+      const response = await fetch(`http://${host}/Login/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`http://${hostLocal}/Logout/`, {
+      const response = await fetch(`http://${host}/Logout/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,3 +129,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+    
